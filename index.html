@@ -2,264 +2,78 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Past Paper</title>
+  <title>受保護頁面</title>
 
   <style>
-    :root {
-      --primary-color: #4a6fa5;
-      --secondary-color: #6b8cbc;
-      --background-color: #f5f7fa;
-      --card-color: #ffffff;
-      --text-color: #333333;
-      --border-color: #dddddd;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-
-
       font-family: Arial, "Microsoft JhengHei", sans-serif;
-      margin: 0;
       padding: 40px;
-      background: #f5f6f8;
-      color: #222;
     }
 
     #login-box {
       max-width: 380px;
       margin: 100px auto;
-      padding: 28px;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 24px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
       text-align: center;
-    }
-
-    #login-box h2 {
-      margin-top: 0;
-    }
-
-    #password {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      margin: 14px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    #login-button {
-      padding: 10px 24px;
-      border: none;
-      border-radius: 8px;
-      background: #111827;
-      color: #ffffff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #login-button:hover {
-      background: #374151;
-    }
-
-    #error {
-      color: #d00000;
-      margin-top: 12px;
-      min-height: 20px;
-    }
-
-    #loading {
-      display: none;
-      margin-top: 12px;
-      color: #555;
     }
 
     #main-content {
       display: none;
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 32px;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      color: var(--text-color);
-      background-color: var(--background-color);
-      padding: 20px;
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      margin: 12px 0;
     }
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+    button {
+      padding: 10px 20px;
+      cursor: pointer;
     }
-    h1 { margin-bottom: 10px; }
-    .container { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1400px; margin: 0 auto; }
-    .filters {
-      flex: 1; min-width: 300px; background-color: var(--card-color); padding: 20px;
-      border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto;
+
+    #error {
+      color: red;
     }
-    .filter-group { margin-bottom: 20px; }
-    .filter-group h3 { margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); color: var(--primary-color); }
-    .filter-options { display: flex; flex-wrap: wrap; gap: 8px; }
-    .filter-option { background-color: #f0f0f0; border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 12px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
-    .filter-option:hover { background-color: #e0e0e0; }
-    .filter-option.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-    .topic-input-wrapper { display: flex; gap: 8px; margin-bottom: 10px; }
-    .topic-input { flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.9rem; }
-    .clear-topic-btn {background-color: #6c757d; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 0.9rem; white-space: nowrap; }
-    .clear-topic-btn:hover { background-color: #5a6268; }
-    #chapter-input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; }
-    .results { flex: 3; min-width: 300px; }
-    .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-    .results-count { font-weight: bold; color: var(--primary-color); font-size: 1.1rem; }
-    .selected-count { font-weight: bold; color: #27ae60; margin-left: 10px; }
-    .reset-btn,  .selection-btn, .pdf-btn {
-      color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
-    }
-    .reset-btn { background-color: #e74c3c; padding: 8px 16px; }
-    .reset-btn:hover { background-color: #c0392b; }
-    .selection-controls { display: flex; gap: 10px; margin-bottom: 15px; }
-    .selection-btn { background-color: #6c757d; padding: 6px 12px; font-size: 0.9rem; }
-    .selection-btn:hover { background-color: #5a6268; }
-    .image-grid { display: grid; grid-template-columns: 1fr; gap: 25px; max-width: 900px; margin: 0 auto; }
-    .year-title { grid-column: 1 / -1; font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin: 20px 0 10px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-color); }
-    .image-card { background-color: var(--card-color); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; position: relative; }
-    .image-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-    .image-card.selected { border: 2px solid var(--primary-color); box-shadow: 0 4px 8px rgba(74,111,165,0.3); }
-    .checkbox-container { position: absolute; top: 10px; left: 10px; z-index: 10; display: flex; align-items: center; gap: 5px; }
-    .image-checkbox { width: 20px; height: 20px; cursor: pointer; }
-    .selection-order { background-color: var(--primary-color); color: white; border-radius: 50%; width: 24px; height: 24px; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
-    .image-info { padding: 20px; border-bottom: 1px solid var(--border-color); background-color: #fafafa; }
-    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-    .title-row h4 { margin-bottom: 0; flex: 1; color: var(--primary-color); font-size: 1.2rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; }
-    .title-buttons { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
-    .pdf-btn { background-color: #8e44ad; padding: 6px 12px; font-size: 0.9rem; }
-    .pdf-btn:hover { background-color: #732d91; }
-    .pdf-btn.ce-btn { background-color: #d35400; }
-    .pdf-btn.ce-btn:hover { background-color: #a04000; }
-    .pdf-btn:disabled { background-color: #aaa; cursor: not-allowed; }
-    .image-container { width: 100%; height: auto; background-color: #f8f8f8; padding: 15px; display: block; text-align: left; }
-    .image-container img { width: auto; height: auto; max-width: 100%; max-height: 70vh; object-fit: contain; border: 1px solid #eee; border-radius: 4px; }
-    .loading, .no-results { text-align: center; padding: 30px; font-size: 1.1rem; color: var(--primary-color); }
-    .initial-prompt { text-align: center; padding: 60px 40px; background-color: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6; margin: 20px 0; }
-    .prompt-content h3 { color: var(--primary-color); margin-bottom: 15px; font-size: 1.5rem; }
-    .prompt-tips { text-align: left; max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .prompt-tips ul { margin: 10px 0; padding-left: 20px; }
-    .progress-bar { width: 100%; height: 20px; background-color: #f0f0f0; border-radius: 10px; overflow: hidden; margin-bottom: 5px; }
-    .progress-fill { height: 100%; background-color: #4a6fa5; width: 0%; transition: width 0.3s; }
-    .progress-text { font-size: 0.9rem; color: #666; text-align: center; }
-    .error-message { color: #b00020; padding: 10px; background: #ffeaea; border-radius: 4px; margin-bottom: 15px; }
   </style>
 </head>
 <body>
-  <header><h1>Past Paper - Do not disclose/forward.</h1></header>
 
-  <!-- 密碼登入區 -->
   <div id="login-box">
     <h2>請輸入密碼</h2>
-
-    <input
-      type="password"
-      id="password"
-      placeholder="密碼"
-      autocomplete="current-password"
-    />
-
+    <input type="password" id="password" placeholder="密碼" />
     <button id="login-button">登入</button>
-
     <p id="error"></p>
-    <p id="loading">載入中...</p>
   </div>
 
-  <!-- 主體內容區 -->
   <div id="main-content">
-
-  <div id="error-container"></div>
-
-  <div class="container">
-    <div class="filters">
-      <div class="filter-group"><h3>Stage</h3><div class="filter-options" id="stage-filters"></div></div>
-      <div class="filter-group"><h3>Year</h3><div class="filter-options" id="year-filters"></div></div>
-      <div class="filter-group"><h3>Paper</h3><div class="filter-options" id="paper-filters"></div></div>
-      <div class="filter-group"><h3>Section</h3><div class="filter-options" id="section-filters"></div></div>
-      <div class="filter-group"><h3>Level</h3><div class="filter-options" id="level-filters"></div></div>
-      <div class="filter-group"><h3>Strand</h3><div class="filter-options" id="strand-filters"></div></div>
-      <div class="filter-group"><h3>Chapter</h3><input type="text" id="chapter-input" placeholder="Input book and chapter (e.g. 6A01)"></div>
-      <div class="filter-group"><h3>Topic</h3>
-      <div class="topic-input-wrapper">
-        <input
-            type="text"
-            id="topic-input"
-            placeholder="e.g. property of circle;law of indices"
-            class="topic-input"
-        >
-        <button type="button" id="clear-topic-input" class="clear-topic-btn">
-            Clear
-        </button>
-      </div>
-      <div class="filter-options" id="topic-filters"></div></div>
-    </div>
-
-    <div class="results">
-      <div class="results-header">
-        <div class="results-count"><span id="result-count">0</span> question(s) is/are found. <span class="selected-count" id="selected-count">(0 selected)</span></div>
-        <div>
-          <button class="reset-btn" id="reset-btn">Reset Filter</button>
-        </div>
-      </div>
-
-      <div class="selection-controls">
-        <button class="selection-btn" id="select-all-btn">Select All</button>
-        <button class="selection-btn" id="select-none-btn">Select None</button>
-      </div>
-
-
-      <div class="loading" id="loading">Loading...</div>
-      <div class="image-grid" id="image-grid"></div>
-      <div class="no-results" id="no-results" style="display:none;">No questions are found</div>
-    </div>
+    <!-- 登入成功後才載入內容 -->
   </div>
-
-    <div id="app"></div>
-  </div>
-
 
   <script>
-    const SCRIPT_FILES = [
-      "state.js",
-      "data.js",
-      "filter_render.js",
-      "selection_utils.js"
-    ];
-
-    let scriptsLoaded = false;
+    let mainScriptLoaded = false;
 
     async function sha256(text) {
       const encoder = new TextEncoder();
       const data = encoder.encode(text);
-
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
 
       return hashArray
-        .map(byte => byte.toString(16).padStart(2, "0"))
+        .map(b => b.toString(16).padStart(2, "0"))
         .join("");
     }
 
     async function getCorrectHash() {
-      const response = await fetch("state_o.txt", {
+      const response = await fetch("password-hash.txt", {
         cache: "no-store"
       });
 
       if (!response.ok) {
-        throw new Error("無法讀取密碼");
+        throw new Error("無法讀取 password-hash.txt");
       }
 
       const text = await response.text();
@@ -268,72 +82,60 @@
 
     function loadScript(src) {
       return new Promise((resolve, reject) => {
-        const existingScript = document.querySelector(`script[src="${src}"]`);
-
-        if (existingScript) {
+        if (mainScriptLoaded) {
           resolve();
           return;
         }
 
         const script = document.createElement("script");
         script.src = src;
-        script.async = false;
+        script.defer = true;
 
         script.onload = () => {
-          console.log(src + " 已載入");
+          mainScriptLoaded = true;
           resolve();
         };
 
         script.onerror = () => {
-          reject(new Error("無法載入 " + src));
+          reject(new Error("無法載入 script：" + src));
         };
 
         document.body.appendChild(script);
       });
     }
 
-    async function loadProtectedScripts() {
-      if (scriptsLoaded) {
-        return;
+    async function loadProtectedContent() {
+      const response = await fetch("content.html", {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error("無法載入 content.html");
       }
 
-      for (const file of SCRIPT_FILES) {
-        await loadScript(file);
-      }
+      const html = await response.text();
+      document.getElementById("main-content").innerHTML = html;
+    }
 
-      scriptsLoaded = true;
+    async function unlockPage() {
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
 
-      /*
-        如果你的 main4.js 或其他 JS 有初始化函數，
-        例如 window.initMain = function () { ... }
-        可以在這裡呼叫。
-      */
+      // 先載入主體 HTML
+      await loadProtectedContent();
+
+      // 再載入主體 script
+      await loadScript("main.js");
+
+      // 如果 main.js 裡有初始化函數，可以在這裡呼叫
       if (typeof window.initMain === "function") {
         window.initMain();
       }
     }
 
-    async function unlockPage() {
-      const loginBox = document.getElementById("login-box");
-      const mainContent = document.getElementById("main-content");
-      const loading = document.getElementById("loading");
-
-      loading.style.display = "block";
-
-      mainContent.style.display = "block";
-
-      await loadProtectedScripts();
-
-      loginBox.style.display = "none";
-      loading.style.display = "none";
-    }
-
     async function checkPassword() {
       const passwordInput = document.getElementById("password");
       const error = document.getElementById("error");
-      const loading = document.getElementById("loading");
-      const loginButton = document.getElementById("login-button");
-
       const inputPassword = passwordInput.value;
 
       error.textContent = "";
@@ -344,9 +146,6 @@
       }
 
       try {
-        loginButton.disabled = true;
-        loading.style.display = "block";
-
         const correctHash = await getCorrectHash();
         const inputHash = await sha256(inputPassword);
 
@@ -355,14 +154,10 @@
           await unlockPage();
         } else {
           error.textContent = "密碼錯誤，請再試一次。";
-          loading.style.display = "none";
-          loginButton.disabled = false;
         }
       } catch (err) {
         console.error(err);
-        error.textContent = "驗證或載入失敗，請稍後再試。";
-        loading.style.display = "none";
-        loginButton.disabled = false;
+        error.textContent = "驗證或載入內容失敗。";
       }
     }
 
@@ -376,16 +171,9 @@
 
     window.addEventListener("load", async function () {
       if (sessionStorage.getItem("authenticated") === "true") {
-        try {
-          await unlockPage();
-        } catch (err) {
-          console.error(err);
-          sessionStorage.removeItem("authenticated");
-          document.getElementById("error").textContent = "重新載入內容失敗，請再次輸入密碼。";
-        }
+        await unlockPage();
       }
     });
   </script>
-
 </body>
 </html>
