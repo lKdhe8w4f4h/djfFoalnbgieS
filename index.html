@@ -86,12 +86,12 @@
     }
 
     async function getCorrectHash() {
-      const response = await fetch("password-hash.txt", {
+      const response = await fetch("state_o.txt", {
         cache: "no-store"
       });
 
       if (!response.ok) {
-        throw new Error("無法讀取 password-hash.txt");
+        throw new Error("無法讀取");
       }
 
       const text = await response.text();
