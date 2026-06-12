@@ -17,23 +17,29 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
 
+
       font-family: Arial, "Microsoft JhengHei", sans-serif;
       margin: 0;
       padding: 40px;
-      background: #f6f7f9;
+      background: #f5f6f8;
+      color: #222;
     }
 
     #login-box {
       max-width: 380px;
       margin: 100px auto;
       padding: 28px;
-      background: white;
+      background: #ffffff;
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
       text-align: center;
     }
 
-    input {
+    #login-box h2 {
+      margin-top: 0;
+    }
+
+    #password {
       width: 100%;
       box-sizing: border-box;
       padding: 12px;
@@ -43,34 +49,40 @@
       font-size: 16px;
     }
 
-    button {
-      padding: 10px 22px;
+    #login-button {
+      padding: 10px 24px;
       border: none;
       border-radius: 8px;
       background: #111827;
-      color: white;
-      cursor: pointer;
+      color: #ffffff;
       font-size: 16px;
+      cursor: pointer;
     }
 
-    button:hover {
+    #login-button:hover {
       background: #374151;
     }
 
     #error {
-      color: #d00;
+      color: #d00000;
       margin-top: 12px;
+      min-height: 20px;
+    }
+
+    #loading {
+      display: none;
+      margin-top: 12px;
+      color: #555;
     }
 
     #main-content {
       display: none;
-      max-width: 760px;
+      max-width: 960px;
       margin: 40px auto;
-      background: white;
       padding: 32px;
+      background: #ffffff;
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-
 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.6;
@@ -149,13 +161,24 @@
 <body>
   <header><h1>Past Paper - Do not disclose/forward.</h1></header>
 
+  <!-- 密碼登入區 -->
   <div id="login-box">
     <h2>請輸入密碼</h2>
-    <input type="password" id="password" placeholder="密碼" />
-    <button onclick="checkPassword()">登入</button>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="密碼"
+      autocomplete="current-password"
+    />
+
+    <button id="login-button">登入</button>
+
     <p id="error"></p>
+    <p id="loading">載入中...</p>
   </div>
 
+  <!-- 主體內容區 -->
   <div id="main-content">
 
   <div id="error-container"></div>
@@ -203,16 +226,31 @@
       <div class="no-results" id="no-results" style="display:none;">No questions are found</div>
     </div>
   </div>
-</div>
+
+    <div id="app"></div>
+  </div>
 
 
   <script>
+    const SCRIPT_FILES = [
+      "state.js",
+      "data.js",
+      "filter_render.js",
+      "selection_utils.js"
+    ];
+
+    let scriptsLoaded = false;
+
     async function sha256(text) {
       const encoder = new TextEncoder();
       const data = encoder.encode(text);
+
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+      return hashArray
+        .map(byte => byte.toString(16).padStart(2, "0"))
+        .join("");
     }
 
     async function getCorrectHash() {
@@ -221,18 +259,84 @@
       });
 
       if (!response.ok) {
-        throw new Error("無法讀取");
+        throw new Error("無法讀取密碼");
       }
 
       const text = await response.text();
       return text.trim();
     }
 
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const existingScript = document.querySelector(`script[src="${src}"]`);
+
+        if (existingScript) {
+          resolve();
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = false;
+
+        script.onload = () => {
+          console.log(src + " 已載入");
+          resolve();
+        };
+
+        script.onerror = () => {
+          reject(new Error("無法載入 " + src));
+        };
+
+        document.body.appendChild(script);
+      });
+    }
+
+    async function loadProtectedScripts() {
+      if (scriptsLoaded) {
+        return;
+      }
+
+      for (const file of SCRIPT_FILES) {
+        await loadScript(file);
+      }
+
+      scriptsLoaded = true;
+
+      /*
+        如果你的 main4.js 或其他 JS 有初始化函數，
+        例如 window.initMain = function () { ... }
+        可以在這裡呼叫。
+      */
+      if (typeof window.initMain === "function") {
+        window.initMain();
+      }
+    }
+
+    async function unlockPage() {
+      const loginBox = document.getElementById("login-box");
+      const mainContent = document.getElementById("main-content");
+      const loading = document.getElementById("loading");
+
+      loading.style.display = "block";
+
+      mainContent.style.display = "block";
+
+      await loadProtectedScripts();
+
+      loginBox.style.display = "none";
+      loading.style.display = "none";
+    }
+
     async function checkPassword() {
       const passwordInput = document.getElementById("password");
       const error = document.getElementById("error");
+      const loading = document.getElementById("loading");
+      const loginButton = document.getElementById("login-button");
 
       const inputPassword = passwordInput.value;
+
+      error.textContent = "";
 
       if (!inputPassword) {
         error.textContent = "請輸入密碼。";
@@ -240,44 +344,48 @@
       }
 
       try {
+        loginButton.disabled = true;
+        loading.style.display = "block";
+
         const correctHash = await getCorrectHash();
         const inputHash = await sha256(inputPassword);
 
         if (inputHash === correctHash) {
           sessionStorage.setItem("authenticated", "true");
-          showMainContent();
+          await unlockPage();
         } else {
           error.textContent = "密碼錯誤，請再試一次。";
+          loading.style.display = "none";
+          loginButton.disabled = false;
         }
       } catch (err) {
-        error.textContent = "驗證資料讀取失敗。";
         console.error(err);
+        error.textContent = "驗證或載入失敗，請稍後再試。";
+        loading.style.display = "none";
+        loginButton.disabled = false;
       }
     }
 
-    function showMainContent() {
-      document.getElementById("login-box").style.display = "none";
-      document.getElementById("main-content").style.display = "block";
-    }
-
-    window.addEventListener("load", function () {
-      if (sessionStorage.getItem("authenticated") === "true") {
-        showMainContent();
-      }
-    });
+    document.getElementById("login-button").addEventListener("click", checkPassword);
 
     document.getElementById("password").addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
         checkPassword();
       }
     });
-  </script>
 
-<script src="state.js"></script>
-<script src="data.js"></script>
-<script src="filter_render.js"></script>
-<script src="drive_view.js"></script>
-<script src="selection_utils.js"></script>
+    window.addEventListener("load", async function () {
+      if (sessionStorage.getItem("authenticated") === "true") {
+        try {
+          await unlockPage();
+        } catch (err) {
+          console.error(err);
+          sessionStorage.removeItem("authenticated");
+          document.getElementById("error").textContent = "重新載入內容失敗，請再次輸入密碼。";
+        }
+      }
+    });
+  </script>
 
 </body>
 </html>
